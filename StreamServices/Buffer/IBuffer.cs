@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace DataServices.Buffer
+namespace StreamServices.Buffer
 {
     public interface IBuffer : IEnumerable
     {
@@ -10,13 +10,9 @@ namespace DataServices.Buffer
         bool IsEmpty { get; }
         bool IsFull { get; }
         int Size { get; }
-        object Back();
-        object Front();
-        void PopBack();
-        void PopFront();
-        void PushBack(object item);
-        void PushFront(object item);
-        object[] ToArray();
+        void Pop();
+        void Push(EventData item);
+        EventData[] ToArray();
         void Serialize();
         List<EventData> ToList();
     }

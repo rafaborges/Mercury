@@ -169,11 +169,8 @@ function initChart(id, canvas) {
     function redrawLineChart() {
 
         setChartParameters();
-
         svgElement.selectAll("g.y.axis").call(yAxisGen);
-
         svgElement.selectAll("g.x.axis").call(xAxisGen);
-
         svgElement.selectAll("." + pathClass)
             .attr("d", lineFunc(data[id]));
     }

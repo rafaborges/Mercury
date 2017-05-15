@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 using StreamServices.Services;
+using System.Linq;
 
-namespace DataServices.Buffer
+namespace StreamServices.Buffer
 {
     /// <summary>
     /// Circular buffer.
@@ -19,7 +20,7 @@ namespace DataServices.Buffer
     /// </summary>
     public class RingBuffer : IBuffer
     {
-        private object[] _buffer;
+        private EventData[] _buffer;
 
         /// <summary>
         /// The _start. Index of the first element in buffer.
@@ -74,7 +75,7 @@ namespace DataServices.Buffer
                     "Too many items to fit circular buffer", "items");
             }
 
-            _buffer = new object[capacity];
+            _buffer = new EventData[capacity];
 
             Array.Copy(items, _buffer, items.Length);
             _size = items.Length;
@@ -97,7 +98,7 @@ namespace DataServices.Buffer
         /// Maximum capacity of the buffer. Elements pushed into the buffer after
         /// maximum capacity is reached (IsFull = true), will remove an element.
         /// </summary>
-        public int Capacity { get { return _buffer.Length; } set { _buffer = new object[value]; } }
+        public int Capacity { get { return _buffer.Length; } set { _buffer = new EventData[value]; } }
 
         public bool IsFull
         {
@@ -140,7 +141,7 @@ namespace DataServices.Buffer
             return _buffer[(_end != 0 ? _end : _size) - 1];
         }
 
-        public object this[int index]
+        public EventData this[int index]
         {
             get
             {
@@ -178,7 +179,7 @@ namespace DataServices.Buffer
         /// popped to allow for this new element to fit.
         /// </summary>
         /// <param name="item">Item to push to the back of the buffer</param>
-        public void PushBack(object item)
+        public void PushBack(EventData item)
         {
             if (IsFull)
             {
@@ -202,7 +203,7 @@ namespace DataServices.Buffer
         /// popped to allow for this new element to fit.
         /// </summary>
         /// <param name="item">Item to push to the front of the buffer</param>
-        public void PushFront(object item)
+        public void PushFront(EventData item)
         {
             if (IsFull)
             {
@@ -226,7 +227,7 @@ namespace DataServices.Buffer
         {
             ThrowIfEmpty("Cannot take elements from an empty buffer.");
             Decrement(ref _end);
-            _buffer[_end] = default(object);
+            _buffer[_end] = default(EventData);
             --_size;
         }
 
@@ -237,7 +238,7 @@ namespace DataServices.Buffer
         public void PopFront()
         {
             ThrowIfEmpty("Cannot take elements from an empty buffer.");
-            _buffer[_start] = default(object);
+            _buffer[_start] = default(EventData);
             Increment(ref _start);
             --_size;
         }
@@ -248,12 +249,12 @@ namespace DataServices.Buffer
         /// order/contents)
         /// </summary>
         /// <returns>A new array with a copy of the buffer contents.</returns>
-        public object[] ToArray()
+        public EventData[] ToArray()
         {
-            object[] newArray = new object[Size];
+            EventData[] newArray = new EventData[Size];
             int newArrayOffset = 0;
-            var segments = new ArraySegment<object>[2] { ArrayOne(), ArrayTwo() };
-            foreach (ArraySegment<object> segment in segments)
+            var segments = new ArraySegment<EventData>[2] { ArrayOne(), ArrayTwo() };
+            foreach (ArraySegment<EventData> segment in segments)
             {
                 Array.Copy(segment.Array, segment.Offset, newArray, newArrayOffset, segment.Count);
                 newArrayOffset += segment.Count;
@@ -264,8 +265,8 @@ namespace DataServices.Buffer
         #region IEnumerable implementation
         public IEnumerator GetEnumerator()
         {
-            var segments = new ArraySegment<object>[2] { ArrayOne(), ArrayTwo() };
-            foreach (ArraySegment<object> segment in segments)
+            var segments = new ArraySegment<EventData>[2] { ArrayOne(), ArrayTwo() };
+            foreach (ArraySegment<EventData> segment in segments)
             {
                 for (int i = 0; i < segment.Count; i++)
                 {
@@ -334,27 +335,27 @@ namespace DataServices.Buffer
         // The array is composed by at most two non-contiguous segments, 
         // the next two methods allow easy access to those.
 
-        private ArraySegment<object> ArrayOne()
+        private ArraySegment<EventData> ArrayOne()
         {
             if (_start < _end)
             {
-                return new ArraySegment<object>(_buffer, _start, _end - _start);
+                return new ArraySegment<EventData>(_buffer, _start, _end - _start);
             }
             else
             {
-                return new ArraySegment<object>(_buffer, _start, _buffer.Length - _start);
+                return new ArraySegment<EventData>(_buffer, _start, _buffer.Length - _start);
             }
         }
 
-        private ArraySegment<object> ArrayTwo()
+        private ArraySegment<EventData> ArrayTwo()
         {
             if (_start < _end)
             {
-                return new ArraySegment<object>(_buffer, _end, 0);
+                return new ArraySegment<EventData>(_buffer, _end, 0);
             }
             else
             {
-                return new ArraySegment<object>(_buffer, 0, _end);
+                return new ArraySegment<EventData>(_buffer, 0, _end);
             }
         }
 
@@ -448,8 +449,11 @@ namespace DataServices.Buffer
 
         public List<EventData> ToList()
         {
-            return null;
+            return ToArray().ToList<EventData>();
         }
+
+        public void Pop() => PopFront();
+        public void Push(EventData item) => PushBack(item);
         #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using DataServices.Buffer;
+﻿using StreamServices.Buffer;
 using Mercury.Scripts.Hubs;
 using Microsoft.AspNet.SignalR;
 using StreamServices;
@@ -51,10 +51,12 @@ namespace Mercury.Models
         /// <param name="d">The value of the object</param>
         private void EventReceived(object data)
         {
+            var eventData = (EventData)data;
+            
             DataUpdater.Instance.BroadcastNewData(
-                ID, 
-                DateTime.Now,
-                Convert.ChangeType(data, DataType));
+                ID,
+                eventData.TimeStamp,
+                Convert.ChangeType(eventData.Value, DataType));
         }
 
         /// <summary>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataServices.Buffer
+namespace StreamServices.Buffer
 {
     public enum BufferPersistenceOptions
     {

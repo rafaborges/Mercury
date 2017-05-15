@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using DataServices.Interfaces;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 
-namespace DataServices.Services.Azure
+namespace StreamServices.Services.Azure
 {
     public class AzureEventHub
     {

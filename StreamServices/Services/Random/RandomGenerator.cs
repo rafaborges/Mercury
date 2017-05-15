@@ -1,13 +1,11 @@
-﻿using System;
+﻿using StreamServices.Buffer;
+using StreamServices.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DataServices.Interfaces;
 using System.Timers;
-using DataServices.Buffer;
-using StreamServices.Services;
-using StreamServices;
 
-namespace DataServices.Services.Random
+namespace StreamServices.Services.Random
 {
     class RandomGenerator<T> : IStreamConsumer
     {
@@ -45,7 +43,7 @@ namespace DataServices.Services.Random
         {
             object o = GetRandom();
             var eventData = new EventData(ID, DateTime.Now, o);
-            Buffer.PushFront(eventData);
+            Buffer.Push(eventData);
             OnNewData(new StreamDataEventArgs(eventData));
         }
 

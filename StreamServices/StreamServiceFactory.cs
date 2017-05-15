@@ -1,10 +1,5 @@
-﻿using DataServices.Buffer;
-using DataServices.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StreamServices.Buffer;
+using StreamServices.Interfaces;
 
 namespace StreamServices
 {
@@ -22,7 +17,6 @@ namespace StreamServices
         {
             return new T();
         }
-
 
         /// <summary>
         /// Instantiates the appropriate IBuffer object

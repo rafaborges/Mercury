@@ -1,6 +1,6 @@
-﻿using DataServices.Buffer;
-using DataServices.Interfaces;
-using DataServices.Services.Random;
+﻿using StreamServices.Buffer;
+using StreamServices.Interfaces;
+using StreamServices.Services.Random;
 using StreamServices.Services;
 using System;
 using System.Collections.Generic;
@@ -83,7 +83,7 @@ namespace StreamServices
                         consumer.Buffer = StreamServiceFactory.CreateBuffer<RingBuffer>(bufferSize);
                         break;
                     case BufferInvalidationType.Time:
-                        consumer.Buffer = null;
+                        consumer.Buffer = StreamServiceFactory.CreateBuffer<TimeBuffer>(bufferSize);
                         break;
                 }   
 
@@ -160,7 +160,7 @@ namespace StreamServices
             if (clientDelegates.ContainsKey(e.EventData.Source))
             {
                 // Here is where the magic happens by dynamically invoking the client's function
-                clientDelegates[e.EventData.Source].ForEach(d => d.DynamicInvoke(e.EventData.Value));
+                clientDelegates[e.EventData.Source].ForEach(d => d.DynamicInvoke(e.EventData));
             }
         }
     }

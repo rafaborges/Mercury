@@ -1,13 +1,8 @@
-﻿using DataServices.Buffer;
-using StreamServices;
+﻿using StreamServices.Buffer;
 using StreamServices.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DataServices.Interfaces
+namespace StreamServices.Interfaces
 {
     public interface IStreamConsumer
     {

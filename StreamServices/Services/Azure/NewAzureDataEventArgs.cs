@@ -1,17 +1,13 @@
-﻿using Microsoft.Azure.EventHubs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using AzureEventData = Microsoft.Azure.EventHubs.EventData;
 
-namespace DataServices.Services.Azure
+namespace StreamServices.Services.Azure
 {
     class NewAzureDataEventArgs : EventArgs
     {
-        private EventData Data;
+        private AzureEventData Data;
 
-        public NewAzureDataEventArgs(EventData data)
+        public NewAzureDataEventArgs(AzureEventData data)
         {
             Data = data;
         }

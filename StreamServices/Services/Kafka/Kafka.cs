@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataServices.Interfaces;
-
-namespace DataServices.Services.Kafka
+﻿
+namespace StreamServices.Services.Kafka
 {
     class Kafka
     {

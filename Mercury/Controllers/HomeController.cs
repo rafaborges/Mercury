@@ -3,7 +3,7 @@ using System.Web.Mvc;
 using Mercury.Models;
 using System;
 using StreamServices;
-using DataServices.Buffer;
+using StreamServices.Buffer;
 
 namespace Mercury.Controllers
 {
@@ -14,6 +14,10 @@ namespace Mercury.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult LoadStreams()
         {
             var model = GetDataStream();

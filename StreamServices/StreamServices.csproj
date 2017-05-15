@@ -74,6 +74,7 @@
     <Compile Include="Buffer\BufferOptions.cs" />
     <Compile Include="Buffer\IBuffer.cs" />
     <Compile Include="Buffer\RingBuffer.cs" />
+    <Compile Include="Buffer\TimeBuffer.cs" />
     <Compile Include="Services\EventData.cs" />
     <Compile Include="Services\StreamDataEventArgs.cs" />
     <Compile Include="ServiceType.cs" />

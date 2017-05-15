@@ -4,8 +4,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
+using AzureEventData = Microsoft.Azure.EventHubs.EventData;
 
-namespace DataServices.Services.Azure
+namespace StreamServices.Services.Azure
 {
     class AzureEventHubProcessor : IEventProcessor
     {
@@ -29,7 +30,7 @@ namespace DataServices.Services.Azure
             return Task.CompletedTask;
         }
 
-        public Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
+        public Task ProcessEventsAsync(PartitionContext context, IEnumerable<AzureEventData> messages)
         {
             foreach (var eventData in messages)
             {
