@@ -1,31 +1,75 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Mercury";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+@section scripts
+{
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="~/Scripts/charts.js"></script>
+}
+
+<div class="panel-body" id="contentArea">
+    @*Chart block*@
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+<!-- Modal -->
+<div class="modal fade" id="streamConfigModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header" id="stream-add">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title" id="exampleModalLabel">New Data Stream</h4>
+            </div>
+            <div class="modal-body">
+                <form id="streamForm">
+                    <div class="form-group">
+                        <label for="streamName" class="form-control-label">Name:</label>
+                        <textarea class="form-control" id="streamName"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceProvider">Service:</label>
+                        <select class="form-control" id="serviceProvider">
+                            <option>Azure Event Hub</option>
+                            <option>Kafka</option>
+                            <option>Redis</option>
+                            <option>Random</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dataType">Data Type:</label>
+                        <select class="form-control" id="dataType">
+                            <option>Double</option>
+                            <option>String</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="connectionString" class="form-control-label">Connection String:</label>
+                        <textarea class="form-control" id="connectionString"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bufferSize" class="form-control-label">Buffer:</label>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input type="number" min="1" class="form-control" id="bufferSize">
+                            </div>
+                            <div class="col-xs-6">
+                                <select class="form-control" id="bufferType">
+                                    <option>Events</option>
+                                    <option>Minutes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Dimiss</button>
+                <button type="button" class="btn btn-primary" id="modalAddButton">Add Stream</button>
+            </div>
+        </div>
     </div>
 </div>
