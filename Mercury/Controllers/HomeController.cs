@@ -5,6 +5,8 @@ using System;
 using StreamServices;
 using StreamServices.Buffer;
 using System.Linq;
+using System.IO;
+using System.Xml.Linq;
 
 namespace Mercury.Controllers
 {
@@ -31,11 +33,11 @@ namespace Mercury.Controllers
         /// <returns></returns>
         private List<StreamListener> GetDataStream()
         {
-            
+
             var streams = new List<StreamListener>
             {
-                new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 25, BufferInvalidationType.Events),
-                new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 100, BufferInvalidationType.Events)
+                // new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 25, BufferInvalidationType.Events),
+                // new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 100, BufferInvalidationType.Events)
             };
 
             // Starting all streams
@@ -89,6 +91,44 @@ namespace Mercury.Controllers
         {
             List<StreamListener> streams = (List<StreamListener>)HttpContext.Application["streams"];
             streams.ForEach(s => s.StartListening());
+        }
+
+        [HttpPost]
+        public void SaveConfiguration(string name)
+        {
+            List<StreamListener> streams = (List<StreamListener>)HttpContext.Application["streams"];
+            XElement config = new XElement("Streams");
+            streams.ForEach(s => config.Add(s.GetConfiguration()));
+            config.Save(name + ".vcfg");
+        }
+
+        [HttpPost]
+        public ActionResult LoadConfiguration(string name)
+        {
+            var streams = new List<StreamListener>();
+            XElement configurations = XElement.Load(name + ".vcfg");
+            foreach (var config in configurations.Elements())
+            {
+                streams.Add(StreamListener.GetStreamFromConfiguration(config));
+            }
+            streams.ForEach(s => s.StartListening());
+            HttpContext.Application["streams"] = streams;
+            return PartialView("ChartElement", streams);
+        }
+
+        /// <summary>
+        /// List all saved configurations
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult GetAllConfigurations()
+        {
+            var files = Directory.EnumerateFiles(".", "*.vcfg").ToArray();
+            var configs = files.Select(f => f
+                                            .Replace(".\\", "")
+                                            .Replace(".vcfg", "")
+                                            ).ToArray();
+            return PartialView("Configurations", configs);
         }
     }
 }

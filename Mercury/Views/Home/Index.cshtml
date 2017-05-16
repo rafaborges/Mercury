@@ -14,13 +14,13 @@
     @*Chart block*@
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="streamConfigModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Add Stream Modal -->
+<div class="modal fade" id="streamConfigModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header" id="stream-add">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
-                <h4 class="modal-title" id="exampleModalLabel">New Data Stream</h4>
+                <h4 class="modal-title">New Data Stream</h4>
             </div>
             <div class="modal-body">
                 <form id="streamForm">
@@ -33,7 +33,6 @@
                         <select class="form-control" id="serviceProvider">
                             <option>Azure Event Hub</option>
                             <option>Kafka</option>
-                            <option>Redis</option>
                             <option>Random</option>
                         </select>
                     </div>
@@ -69,6 +68,30 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Dimiss</button>
                 <button type="button" class="btn btn-primary" id="modalAddButton">Add Stream</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Config Modal -->
+<div class="modal fade" id="saveConfig" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">Save Current Confiuration</h4>
+            </div>
+            <div class="modal-body">
+                <form id="saveForm">
+                    <div class="form-group">
+                        <label for="configName" class="form-control-label">Name:</label>
+                        <input class="form-control" id="configName">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Dimiss</button>
+                <button type="button" class="btn btn-primary" id="saveConfigButton">Save Config</button>
             </div>
         </div>
     </div>

@@ -1,0 +1,6 @@
+﻿@model string[]
+
+@foreach (var element in Model)
+{
+    <h4 class="dropdown-item hover-div" onclick="loadConfiguration('@element');">@element</h4>
+}

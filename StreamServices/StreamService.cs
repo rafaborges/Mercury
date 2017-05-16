@@ -113,6 +113,11 @@ namespace StreamServices
             return consumers.SingleOrDefault(c => c.ID == id)?.Buffer.ToList();
         }
 
+        public bool HasID(Guid id)
+        {
+            return consumers.SingleOrDefault(c => c.ID == id) != null ? true : false;
+        }
+
         /// <summary>
         /// Start listening to a service by providing a service ID and an 
         /// action to be executed whenever new data comes is

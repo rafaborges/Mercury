@@ -32,3 +32,12 @@
 .toolbar-space{
     margin-top: 5px;
 }
+
+.hover-div {
+    padding-left: 5px;
+    cursor: pointer;
+}
+
+.hover-div:hover {
+    background: #223241;
+}

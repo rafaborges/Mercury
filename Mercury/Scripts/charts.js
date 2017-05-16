@@ -72,31 +72,12 @@ $(document).ready(function () {
     });
 
     // Firing up the modal once the + button is clicked
-    $("#addChartBtn").click(function () {
+    $("#addChart").click(function () {
         $("#streamConfigModal").modal({ backdrop: "static" });
     });
 
     // Lazy Loading data
-    $('#contentArea').load('Home/LoadStreams',
-        function (response, status, hxr) {
-            if (status == "error")
-            {
-                // Clear content and pop up error
-                alert('error');
-            }
-            else
-            {
-                // Remove load spinner
-
-                // Creating the charts and connecting to SignalR
-                $("[id^='chart-']").each(function () {
-                    var id = $(this).data("stream-id");
-                    data[id] = getBufferedValues($(this).data("buffered"));
-                    $(this).removeAttr("data-buffered");
-                    charts[id] = initChart(id, $(this)[0]);
-                })
-            }
-        });
+    $('#contentArea').load('Home/LoadStreams', LoadCharts);
 
     $('#startAllStreams').click(function () {
         $.ajax({
@@ -110,6 +91,26 @@ $(document).ready(function () {
             type: "POST",
             url: 'Home/StopAllStreams'
         });
+    });
+
+    $('#saveView').click(function () {
+        $("#saveConfig").modal({ backdrop: "static" });
+    });
+
+    $('#saveConfigButton').click(function () {
+        $.ajax({
+            type: "POST",
+            data: { name: $("#configName").val() },
+            url: 'Home/SaveConfiguration'
+        });
+
+        $('#saveForm').each(function () {
+            this.reset();
+        });
+    });
+
+    $('#loadConfiguredViews').click(function () {
+        $('#configurations').load('Home/GetAllConfigurations')
     });
 });
 
@@ -193,6 +194,29 @@ function initChart(id, canvas) {
     }
 }
 
+function LoadCharts (response, status, hxr) {
+    if (status == "error") {
+        // Clear content and pop up error
+        alert('error');
+    }
+    else {
+        // Creating the charts and connecting to SignalR
+        $("[id^='chart-']").each(function () {
+            var id = $(this).data("stream-id");
+            data[id] = getBufferedValues($(this).data("buffered"));
+            $(this).removeAttr("data-buffered");
+            charts[id] = initChart(id, $(this)[0]);
+        })
+    }
+}
+
+function loadConfiguration(configuration)
+{
+    $('#contentArea').load('Home/LoadConfiguration',
+        { name: configuration },
+        LoadCharts);
+}
+
 function getBufferedValues(bufferedData) {
     var data = [];
     for (var i = 0; i < bufferedData.length; i++) {
@@ -202,6 +226,16 @@ function getBufferedValues(bufferedData) {
         });
     }
     return data;
+}
+
+function removeChart(id) {
+    $("#row-" + id).slideUp("slow", function () {
+        $("#row-" + id).hide();
+        $("#row-" + id).remove();
+        stopListening(id);
+        delete charts[id];
+        delete data[id];
+    })
 }
 
 function stopListening(id){
