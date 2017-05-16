@@ -1,32 +1,28 @@
 ﻿var charts = {};
 var data = {};
-var buffereData = {};
-
 
 $(document).ready(function () {
-
-
     var dataHub = $.connection.dataHub;
+
+    // Registering the function that is called by SignalR
     dataHub.client.updateStream = function (id, timeStamp, value) {
         if (id in data)
         {
-            //console.log(id + " " + timeStamp + " " + value);
-
             if (data[id].length != null){
                 data[id].push(
                     {
                         timeStamp: (new Date(timeStamp)).toISOString(),
-                        frequency: value
+                        value: value
                     });
             }
             else {
                 data[id] = [{
                     timeStamp: (new Date(timeStamp)).toISOString(),
-                    frequency: value}]
+                    value: value}]
             }
 
             if (data[id].length != null) {
-                if (data[id].length >= 25)
+                if (data[id].length >= $("#chart-" + id).data("size"))
                     data[id].splice(0, 1);
             }
 
@@ -36,7 +32,6 @@ $(document).ready(function () {
         }
     };
 
-    //function init() { }
     $.connection.hub.start();
 
     // Adding the chart once the use is done
@@ -53,8 +48,10 @@ $(document).ready(function () {
             function (returnedData) {
                 var newStream = $(returnedData);
                 var canvas = $(newStream).find("[id^='chart-']");
-                var id = canvas.attr("id").replace("chart-", "");
-                data[id] = getRandomData();
+                var dataElement = $(newStream).find("[id^='data-']");
+                var id = canvas.data("stream-id");
+                data[id] = getBufferedValues(canvas.data("buffered"));
+                canvas.removeAttr("data-buffered");
                 charts[id] = initChart(id, canvas[0]);
                 // Fancying up...
                 newStream.hide();
@@ -93,22 +90,37 @@ $(document).ready(function () {
 
                 // Creating the charts and connecting to SignalR
                 $("[id^='chart-']").each(function () {
-                    var id = $(this).attr("id").replace("chart-", "");
-                    data[id] = {};
-                    charts[id] = initChart(id, $(this)[0]);                    
+                    var id = $(this).data("stream-id");
+                    data[id] = getBufferedValues($(this).data("buffered"));
+                    $(this).removeAttr("data-buffered");
+                    charts[id] = initChart(id, $(this)[0]);
                 })
             }
+        });
+
+    $('#startAllStreams').click(function () {
+        $.ajax({
+            type: "POST",
+            url: 'Home/StartAllStreams'
+        });
+    });
+
+    $('#stopAllStreams').click(function () {
+        $.ajax({
+            type: "POST",
+            url: 'Home/StopAllStreams'
+        });
     });
 });
 
-
+// Initialize the 3D chart
 function initChart(id, canvas) {
     var margin = { top: 0, right: 0, bottom: 20, left: 20 },
         width = 960 - margin.left - margin.right,
         height = 250 - margin.top - margin.bottom;
 
     var format = d3.utcParse("%Y-%m-%dT%H:%M:%S.%L%Z");
-    var freqFunc = function (d) { return d.frequency }
+    var freqFunc = function (d) { return d.value }
     var dateFunc = function (d) { return format(d.timeStamp) }
 
     var svgElement = d3.select(canvas).append("svg")
@@ -141,7 +153,7 @@ function initChart(id, canvas) {
                 return xScale(format(d.timeStamp));
             })
             .y(function (d) {
-                return yScale(d.frequency);
+                return yScale(d.value);
             });
     }
 
@@ -175,29 +187,35 @@ function initChart(id, canvas) {
             .attr("d", lineFunc(data[id]));
     }
 
+    // Returns the function to be updated later
     return {
         redrawChart: redrawLineChart
     }
 }
 
-function getRandomData() {
-
-    var d = new Date();
-
-    function converterOffset(d, o) {
-        dt = new Date(d - o * 5000);
-        return dt.toISOString();
+function getBufferedValues(bufferedData) {
+    var data = [];
+    for (var i = 0; i < bufferedData.length; i++) {
+        data.push({
+            timeStamp: (new Date(bufferedData[i].FormatedTimeStamp)).toISOString(),
+            value: bufferedData[i].Value
+        });
     }
+    return data;
+}
 
-    function getEntry(d,o) {
-        return { timeStamp: converterOffset(d, o), frequency: Math.random() };
-    }
+function stopListening(id){
+    $.ajax({
+        type: "POST",
+        url: 'Home/StopDataStream',
+        data: { id: id }
+    });
+}
 
-    var randomData = [];
-
-    for (i = 0; i < 25; i++)
-    {
-        randomData.unshift(getEntry(d, i));
-    }
-    return randomData;
+function startListening(id) {
+    $.ajax({
+        type: "POST",
+        url: 'Home/StartDataStream',
+        data: { id: id }
+    });
 }

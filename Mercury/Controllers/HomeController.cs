@@ -4,6 +4,7 @@ using Mercury.Models;
 using System;
 using StreamServices;
 using StreamServices.Buffer;
+using System.Linq;
 
 namespace Mercury.Controllers
 {
@@ -30,13 +31,16 @@ namespace Mercury.Controllers
         /// <returns></returns>
         private List<StreamListener> GetDataStream()
         {
+            
             var streams = new List<StreamListener>
             {
-                new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 25, BufferInvalidationType.Events)
+                new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 25, BufferInvalidationType.Events),
+                new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 100, BufferInvalidationType.Events)
             };
 
             // Starting all streams
             streams.ForEach(s => s.StartListening());
+            HttpContext.Application["streams"] = streams;
             return streams;
         }
 
@@ -59,11 +63,32 @@ namespace Mercury.Controllers
 
 
         [HttpPost]
-        public bool RemoveDataStream(Guid id)
+        public void StopDataStream(Guid id)
         {
-            // Remove from Collection
+            List<StreamListener> streams = (List<StreamListener>) HttpContext.Application["streams"];
+            streams.SingleOrDefault(s => s.ID == id)?.StopListening();
+        }
 
-            return true;
+        [HttpPost]
+        public void StartDataStream(Guid id)
+        {
+            List<StreamListener> streams = (List<StreamListener>)HttpContext.Application["streams"];
+            streams.SingleOrDefault(s => s.ID == id)?.StartListening();
+        }
+
+
+        [HttpPost]
+        public void StopAllStreams()
+        {
+            List<StreamListener> streams = (List<StreamListener>)HttpContext.Application["streams"];
+            streams.ForEach(s => s.StopListening());
+        }
+
+        [HttpPost]
+        public void StartAllStreams()
+        {
+            List<StreamListener> streams = (List<StreamListener>)HttpContext.Application["streams"];
+            streams.ForEach(s => s.StartListening());
         }
     }
 }

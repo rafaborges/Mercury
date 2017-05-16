@@ -10,7 +10,7 @@
     <script src="~/Scripts/charts.js"></script>
 }
 
-<div class="panel-body" id="contentArea">
+<div class="panel-body sortable" id="contentArea">
     @*Chart block*@
 </div>
 
@@ -54,7 +54,7 @@
                         <label for="bufferSize" class="form-control-label">Buffer:</label>
                         <div class="row">
                             <div class="col-xs-6">
-                                <input type="number" min="1" class="form-control" id="bufferSize">
+                                <input type="number" min="1" value="100" class="form-control" id="bufferSize">
                             </div>
                             <div class="col-xs-6">
                                 <select class="form-control" id="bufferType">

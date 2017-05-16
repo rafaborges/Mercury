@@ -31,6 +31,7 @@ namespace StreamServices.Services.Random
                 timer = new Timer();
                 timer.Interval = 1000;
                 timer.Elapsed += Timer_Tick;
+                FillBuffer();
                 timer.Start();
             }
             else
@@ -75,6 +76,18 @@ namespace StreamServices.Services.Random
                 typeof(Boolean)
             };
             return supportedTypes.Contains(typeof(T));
+        }
+
+        private void FillBuffer()
+        {
+            var baseDate = DateTime.Now;
+            for (int i = 0; i < Buffer.Capacity; i++)
+            {
+                Buffer.Push(new EventData(
+                    ID, 
+                    baseDate.AddSeconds(i - Buffer.Capacity), 
+                    GetRandom()));
+            }
         }
 
         private object GetRandom()
