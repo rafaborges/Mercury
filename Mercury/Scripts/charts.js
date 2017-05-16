@@ -104,6 +104,8 @@ $(document).ready(function () {
             url: 'Home/SaveConfiguration'
         });
 
+        $("#saveConfig").modal("hide");
+
         $('#saveForm').each(function () {
             this.reset();
         });
