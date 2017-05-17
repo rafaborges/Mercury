@@ -55,8 +55,8 @@ $(document).ready(function () {
         // Post returns the PartialView for the new div
         $.post('Home/AddDataStream', {
             name: $("#streamName").val(),
-            connectionString: $("#serviceProvider").val(),
-            source: $("#connectionString").val(),
+            connectionString: $("#connectionString").val(),
+            source: $("#serviceProvider").val(),
             dataType: $("#dataType").val(), 
             bufferSize: $("#bufferSize").val(),
             bufferType: $("#bufferType").val()

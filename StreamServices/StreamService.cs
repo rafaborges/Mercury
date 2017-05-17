@@ -5,6 +5,7 @@ using StreamServices.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using StreamServices.Services.Kafka;
 
 namespace StreamServices
 {
@@ -67,7 +68,7 @@ namespace StreamServices
                         consumer = null;
                         break;
                     case ServiceType.Kafka:
-                        consumer = null;
+                        consumer = StreamServiceFactory.CreateConsumer<Kafka<double>>();
                         break;
                     case ServiceType.Random:
                         consumer = StreamServiceFactory.CreateConsumer<RandomGenerator<double>>();

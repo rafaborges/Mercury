@@ -42,7 +42,8 @@ namespace Mercury.Controllers
         {
             Type type = Type.GetType("System." + dataType);
             BufferInvalidationType buffer = bufferType == "event" ? BufferInvalidationType.Events : BufferInvalidationType.Time;
-            StreamListener stream = new StreamListener(name, ServiceType.Random, "", type, bufferSize, buffer);
+            ServiceType service = (ServiceType)Enum.Parse(typeof(ServiceType), source);
+            StreamListener stream = new StreamListener(name, service, "", type, bufferSize, buffer);
             var model = new List<StreamListener>() { stream };
             stream.StartListening();
 
