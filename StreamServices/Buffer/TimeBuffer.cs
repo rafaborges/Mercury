@@ -2,32 +2,80 @@
 using System.Collections.Generic;
 using StreamServices.Services;
 using System.Collections;
+using System.Timers;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StreamServices.Buffer
 {
+    /// <summary>
+    /// Buffer with data invalidation based on residence time
+    /// </summary>
     class TimeBuffer : IBuffer
     {
-        public int Capacity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        /// <summary>
+        /// Lock object for the monitor
+        /// </summary>
+        static readonly object _locker = new object();
 
-        public bool IsEmpty => throw new NotImplementedException();
+        /// <summary>
+        /// Data repository
+        /// </summary>
+        private List<Tuple<Guid, EventData>> _data;
 
-        public bool IsFull => throw new NotImplementedException();
+        public TimeBuffer()
+        {
+            _data = new List<Tuple<Guid, EventData>>();
+        }
 
-        public int Size => throw new NotImplementedException();
+        /// <summary>
+        /// Retention in seconds
+        /// </summary>
+        public int Capacity { get; set; }
+
+        public bool IsEmpty => _data.Count == 0 ? true : false;
+
+        /// <summary>
+        /// In this Time buffer implementation, the buffer
+        /// is never full
+        /// </summary>
+        public bool IsFull => false;
+
+        public int Size => _data.Count;
 
         public IEnumerator GetEnumerator()
         {
-            throw new NotImplementedException();
+            return _data.Select(d => d.Item2).GetEnumerator();
         }
 
         public void Pop()
         {
-            throw new NotImplementedException();
+            lock (_locker)
+            {
+                if (_data.Count > 0)
+                    _data.RemoveAt(0);
+            }
         }
 
         public void Push(EventData item)
         {
-            throw new NotImplementedException();
+            // Generating an unique identifier for the tuple
+            var id = Guid.NewGuid();
+            // locking...
+            lock (_locker)
+            {
+                _data.Add(new Tuple<Guid, EventData>(id, item));
+            }
+
+            // Here we create a new tas that will be schedule
+            // To be executed in span seconds
+            // This is the best approach for a asp.net mvc
+            // fire & forget.
+            Task.Factory.StartNew(async () =>
+            {
+                await Task.Delay(Capacity * 1000);
+                DeleteData(id);
+            });
         }
 
         public void Serialize()
@@ -37,12 +85,20 @@ namespace StreamServices.Buffer
 
         public EventData[] ToArray()
         {
-            throw new NotImplementedException();
+            return _data.Select(d => d.Item2).ToArray();
         }
 
         public List<EventData> ToList()
         {
-            throw new NotImplementedException();
+            return _data.Select(d => d.Item2).ToList();
+        }
+
+        private void DeleteData(Guid id)
+        {
+            lock(_locker)
+            {
+                _data.RemoveAll(o => o.Item1 == id);
+            }
         }
     }
 }

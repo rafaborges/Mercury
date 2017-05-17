@@ -3,6 +3,7 @@ using StreamServices.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace StreamServices.Services.Random
@@ -84,11 +85,12 @@ namespace StreamServices.Services.Random
             for (int i = 0; i < Buffer.Capacity; i++)
             {
                 Buffer.Push(new EventData(
-                    ID, 
-                    baseDate.AddSeconds(i - Buffer.Capacity), 
-                    GetRandom()));
+                                    ID,
+                                    baseDate.AddSeconds(i - Buffer.Capacity),
+                                    GetRandom()));
             }
         }
+   
 
         private object GetRandom()
         {
