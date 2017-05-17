@@ -12,10 +12,12 @@ namespace StreamServices.Services
     public class StreamDataEventArgs : EventArgs
     {
         public EventData EventData { get; set; }
+        public List<EventData> BufferedValues { get; set; }
 
-        public StreamDataEventArgs(EventData data)
+        public StreamDataEventArgs(EventData data, List<EventData> bufferedValues)
         {
             EventData = data;
+            BufferedValues = bufferedValues;
         }
     }
 }

@@ -19,11 +19,11 @@ namespace StreamServices
         // Lets make it thread safe
         private static object syncRoot = new Object();
         private List<IStreamConsumer> consumers;
-        private Dictionary<Guid, List<Action<object>>> clientDelegates;
+        private Dictionary<Guid, List<Action<StreamDataEventArgs>>> clientDelegates;
 
         private StreamService() {
             consumers = new List<IStreamConsumer>();
-            clientDelegates = new Dictionary<Guid, List<Action<object>>>();
+            clientDelegates = new Dictionary<Guid, List<Action<StreamDataEventArgs>>>();
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace StreamServices
         /// </summary>
         /// <param name="id">The ID of the service</param>
         /// <param name="action">The action to be executed when new data arrives</param>
-        public void SubscribeService(Guid id, Action<object> action)
+        public void SubscribeService(Guid id, Action<StreamDataEventArgs> action)
         {
             // Reasons to use an action to a function:
             // (1) Security: subscribers have to have a valid guid. 
@@ -138,7 +138,7 @@ namespace StreamServices
             }
             else
             {
-                clientDelegates.Add(id, new List<Action<object>> { action });
+                clientDelegates.Add(id, new List<Action<StreamDataEventArgs>> { action });
             }
         }
 
@@ -147,7 +147,7 @@ namespace StreamServices
         /// </summary>
         /// <param name="id">The ID of the service</param>
         /// <param name="action">The action that is executed when new data arrives</param>
-        public void UnsubscribeService(Guid id, Action<object> action)
+        public void UnsubscribeService(Guid id, Action<StreamDataEventArgs> action)
         {
             if (clientDelegates.ContainsKey(id))
             {
@@ -165,7 +165,7 @@ namespace StreamServices
             if (clientDelegates.ContainsKey(e.EventData.Source))
             {
                 // Here is where the magic happens by dynamically invoking the client's function
-                clientDelegates[e.EventData.Source].ForEach(d => d.DynamicInvoke(e.EventData));
+                clientDelegates[e.EventData.Source].ForEach(d => d.DynamicInvoke(e));
             }
         }
     }

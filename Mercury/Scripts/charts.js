@@ -4,7 +4,7 @@ var data = {};
 $(document).ready(function () {
     var dataHub = $.connection.dataHub;
 
-    // Registering the function that is called by SignalR
+    // Registering the function that is called by SignalR on NewEvent
     dataHub.client.updateStream = function (id, timeStamp, value) {
         if (id in data)
         {
@@ -29,6 +29,22 @@ $(document).ready(function () {
             if (id in charts) {
                 charts[id].redrawChart();
             }
+        }
+    };
+
+
+    // Registering the function that is called by SignalR on NewEvent
+    dataHub.client.updateAllData = function (id, tempData) {
+        $.each(tempData, function () {
+            delete this["Source"];
+            delete this["TimeStamp"];
+            this["timeStamp"] = (new Date(this.FormatedTimeStamp)).toISOString();
+            this["value"] = this.Value;
+            delete this["Value"];
+        })
+        data[id] = tempData;
+        if (id in charts) {
+            charts[id].redrawChart();
         }
     };
 

@@ -46,7 +46,7 @@ namespace StreamServices.Services.Random
             object o = GetRandom();
             var eventData = new EventData(ID, DateTime.Now, o);
             Buffer.Push(eventData);
-            OnNewData(new StreamDataEventArgs(eventData));
+            OnNewData(new StreamDataEventArgs(eventData, Buffer.ToList()));
         }
 
         public void UnregisterConsumer()

@@ -15,36 +15,19 @@ namespace Mercury.Controllers
     {
         public ActionResult Index()
         {
+            // This will hold StreamListeners accross all instances of this controller
+            HttpContext.Application["streams"] = new List<StreamListener>();
             return View();
         }
 
         /// <summary>
-        /// 
+        /// This loader can be used in the future to always load a set of
+        /// streams on start
         /// </summary>
         /// <returns></returns>
         public ActionResult LoadStreams()
-        {
-            var model = GetDataStream();
-            return PartialView("ChartElement", model);
-        }
-
-        /// <summary>
-        /// Get all StreamListeners saved on the main repository
-        /// </summary>
-        /// <returns></returns>
-        private List<StreamListener> GetDataStream()
-        {
-
-            var streams = new List<StreamListener>
-            {
-                // new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 25, BufferInvalidationType.Events),
-                // new StreamListener("Random Stream #1", ServiceType.Random, "", typeof(double), 100, BufferInvalidationType.Events)
-            };
-
-            // Starting all streams
-            streams.ForEach(s => s.StartListening());
-            HttpContext.Application["streams"] = streams;
-            return streams;
+        {            
+            return PartialView("ChartElement", new List<StreamListener>());
         }
 
         /// <summary>
@@ -62,6 +45,10 @@ namespace Mercury.Controllers
             StreamListener stream = new StreamListener(name, ServiceType.Random, "", type, bufferSize, buffer);
             var model = new List<StreamListener>() { stream };
             stream.StartListening();
+
+            List<StreamListener> streams = (List<StreamListener>)HttpContext.Application["streams"];
+            streams.Add(stream);
+
             return PartialView("ChartElement", model);
         }
 

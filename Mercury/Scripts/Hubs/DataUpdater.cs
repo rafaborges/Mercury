@@ -34,6 +34,11 @@ namespace Mercury.Scripts.Hubs
             Clients.All.updateStream(id, timeStamp, value);
         }
 
+        public void BroadcastAllData(Guid id, List<EventData> data)
+        {
+            Clients.All.updateAllData(id, data);
+        }
+
         public void InitChartData(Guid id, List<EventData> data)
         {
             Clients.All.initData(id, data);

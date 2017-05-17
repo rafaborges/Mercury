@@ -24,7 +24,7 @@ namespace Mercury.Models
         public int BufferSize { get; set; }
         public BufferInvalidationType BufferType { get; set; }
 
-        private Action<object> action;
+        private Action<StreamDataEventArgs> action;
 
         /// <summary>
         /// Default ctor for StreamListener class
@@ -41,7 +41,7 @@ namespace Mercury.Models
             DataType = dataType;
             BufferSize = bufferSize;
             BufferType = bufferType;
-            action = new Action<object>(EventReceived);
+            action = new Action<StreamDataEventArgs>(EventReceived);
             // Asking an ID for the StreamServices. If the source already exists with a given
             // connection string, the same source is reused
             ID = StreamService.Instance.InitService(connectionString, source, bufferSize, bufferType);
@@ -63,14 +63,14 @@ namespace Mercury.Models
         /// Broadcast data to all registered clients matching the stream ID
         /// </summary>
         /// <param name="d">The value of the object</param>
-        private void EventReceived(object data)
-        {
-            var eventData = (EventData)data;
-            
-            DataUpdater.Instance.BroadcastNewData(
-                ID,
-                eventData.TimeStamp,
-                Convert.ChangeType(eventData.Value, DataType));
+        private void EventReceived(StreamDataEventArgs data)
+        {   
+            //DataUpdater.Instance.BroadcastNewData(
+            //    ID,
+            //    data.EventData.TimeStamp,
+            //    Convert.ChangeType(data.EventData.Value, DataType));
+
+            DataUpdater.Instance.BroadcastAllData(ID, data.BufferedValues);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Mercury.Models
                 DataType = Type.GetType(configuration.Attribute("DataType").Value)
             };
 
-            listener.action = new Action<object>(listener.EventReceived);
+            listener.action = new Action<StreamDataEventArgs>(listener.EventReceived);
 
             // It tries to reuse the same ID, but there is no guarantee that it exists
             var tempID = Guid.Parse(configuration.Attribute("ID").Value);
