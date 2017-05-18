@@ -252,14 +252,21 @@ namespace StreamServices.Buffer
         public EventData[] ToArray()
         {
             EventData[] newArray = new EventData[Size];
-            int newArrayOffset = 0;
-            var segments = new ArraySegment<EventData>[2] { ArrayOne(), ArrayTwo() };
-            foreach (ArraySegment<EventData> segment in segments)
+            if (Size > 0)
             {
-                Array.Copy(segment.Array, segment.Offset, newArray, newArrayOffset, segment.Count);
-                newArrayOffset += segment.Count;
+                int newArrayOffset = 0;
+                var segments = new ArraySegment<EventData>[2] { ArrayOne(), ArrayTwo() };
+                foreach (ArraySegment<EventData> segment in segments)
+                {
+                    Array.Copy(segment.Array, segment.Offset, newArray, newArrayOffset, segment.Count);
+                    newArrayOffset += segment.Count;
+                }
+                return newArray;
             }
-            return newArray;
+            else
+            {
+                return newArray;
+            }
         }
 
         #region IEnumerable implementation

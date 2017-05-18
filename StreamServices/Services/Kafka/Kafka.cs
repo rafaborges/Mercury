@@ -5,81 +5,82 @@ using Confluent.Kafka.Serialization;
 using System.Collections.Generic;
 using Confluent.Kafka;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace StreamServices.Services.Kafka
 {
+    /// <summary>
+    /// Class that implements a Kafka consumer
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     class Kafka<T> : IStreamConsumer
     {
-        public string ConnectionSring { get; set; }
         public Guid ID { get; set; }
         public IBuffer Buffer { get; set; }
-
         public ServiceType ServiceType => ServiceType.Kafka;
+        public Dictionary<string, object> Configuration { get; set; }
 
         public event EventHandler<StreamDataEventArgs> NewData;
 
-        private Consumer<Null, string> consumer;
+        /// <summary>
+        /// This is the task where the main consumer is executed
+        /// </summary>
+        private Task consumerTask;
+
         public Kafka()
         {
             ID = Guid.NewGuid();
-
-            
-
-            //while (true)
-            //{
-            //    Message<Null, string> msg;
-            //    if (consumer.Consume(out msg))
-            //    {
-            //        Console.WriteLine($"Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
-            //    }
-            //}
-
-            //var config = new Config() { GroupId = "example-csharp-consumer" };
-            //using (var consumer = new EventConsumer(config, "127.0.0.1:9092"))
-            //{
-            //    consumer.OnMessage += (obj, msg) =>
-            //    {
-            //        string text = Encoding.UTF8.GetString(msg.Payload, 0, msg.Payload.Length);
-            //        Console.WriteLine($"Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {text}");
-            //    };
-
-            //    consumer.Subscribe(new[] { "testtopic" });
-            //    consumer.Start();
-
-            //    Console.WriteLine("Started consumer, press enter to stop consuming");
-            //    Console.ReadLine();
-            //}
         }
 
-        private void Consumer_OnMessage(object sender, Message<Null, string> e)
+        public bool ValidateConfiguration(Dictionary<string, object> configuration)
         {
-            EventData data = new EventData(ID, e.Timestamp.UtcDateTime, Convert.ChangeType(e.Value,typeof(T)));
-            Buffer.Push(data);
-            OnNewData(new StreamDataEventArgs(data,Buffer.ToList()));
-        }
+            if (configuration.ContainsKey("host"))
+                if (configuration.ContainsKey("topic"))
+                    return true;
 
-        public void RegisterConsumer()
-        {
-            var config = new Dictionary<string, object>
-            {
-                { "group.id", "simple-csharp-consumer" },
-                { "bootstrap.servers", "Localhost:9092" }
-            };
-
-            consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8));
-            consumer.OnMessage += Consumer_OnMessage;
-            consumer.Assign(new List<TopicPartitionOffset> { new TopicPartitionOffset("tutorial", 0, 0) });
-            consumer.Poll();
+            return false;
         }
 
         public void UnregisterConsumer()
         {
-            throw new NotImplementedException();
+            consumerTask?.Dispose();
         }
 
         protected virtual void OnNewData(StreamDataEventArgs e)
         {
             NewData?.Invoke(null, e);
+        }
+
+        public void RegisterConsumer()
+        {
+            // Kafka consumers are usually STA. Starting a new task allows the application
+            // to fully manage the access to the server.
+            consumerTask = Task.Factory.StartNew(() =>
+            {
+                var config = new Dictionary<string, object>
+                {
+                    { "group.id", "mercury-consumer" },
+                    { "bootstrap.servers", Configuration["host"].ToString() }
+                };
+
+                using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
+                {
+                    consumer.OnMessage += (_, e) => {
+                        EventData data = new EventData(ID, DateTime.Now, Convert.ChangeType(e.Value, typeof(T)));
+                        Buffer.Push(data);
+                        OnNewData(new StreamDataEventArgs(data, Buffer.ToList()));
+                    };
+
+                    consumer.Subscribe(Configuration["topic"].ToString());
+
+                    // Ugly, I known, but it's encapsulated in a separated Task than can later
+                    // be disposed
+                    while (true) 
+                    {
+                        consumer.Poll();
+                    }
+                }
+            });
         }
     }
 }

@@ -1,13 +1,10 @@
 ﻿using StreamServices.Buffer;
 using Mercury.Scripts.Hubs;
-using Microsoft.AspNet.SignalR;
 using StreamServices;
 using StreamServices.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
-using System.Web;
 using System.Xml.Linq;
 
 namespace Mercury.Models
@@ -17,12 +14,12 @@ namespace Mercury.Models
     {
         public string Name { get; set; }
         public ServiceType Source { get; set; }
-        public string ConnectionString { get; set; }
         public Guid ID { get; set; }
         public List<EventData> BufferedValues { get; set; }
         public Type DataType { get; set; }
         public int BufferSize { get; set; }
         public BufferInvalidationType BufferType { get; set; }
+        public Dictionary<string, object> Configuration { get; set; }
 
         private Action<StreamDataEventArgs> action;
 
@@ -31,20 +28,21 @@ namespace Mercury.Models
         /// </summary>
         /// <param name="name">Name of the instance</param>
         /// <param name="source">Sources listed in <see cref="ServiceType"/> </param>
-        /// <param name="connectionString">Connection string to be used</param>
         /// <param name="dataType">Expected type of data. Data Will always be casted to this type.</param>
-        public StreamListener(string name, ServiceType source, string connectionString, Type dataType, int bufferSize, BufferInvalidationType bufferType)
+        public StreamListener(string name, ServiceType source, Type dataType, int bufferSize, 
+            BufferInvalidationType bufferType, Dictionary<string, object> configuration)
         {
             Name = name;
             Source = source;
-            ConnectionString = connectionString;
             DataType = dataType;
             BufferSize = bufferSize;
             BufferType = bufferType;
+            Configuration = configuration;
             action = new Action<StreamDataEventArgs>(EventReceived);
             // Asking an ID for the StreamServices. If the source already exists with a given
-            // connection string, the same source is reused
-            ID = StreamService.Instance.InitService(connectionString, source, bufferSize, bufferType);
+            // configuration, the same source is reused
+            ID = StreamService.Instance.InitService(source, 
+                bufferSize, bufferType, configuration);
             
             // Get current buffered data. Note that if takes too long to start listening,
             // it may be outdated
@@ -54,10 +52,7 @@ namespace Mercury.Models
         /// <summary>
         /// Private constructor for late biding through confguration load
         /// </summary>
-        private StreamListener()
-        {
-
-        }
+        private StreamListener() { }
 
         /// <summary>
         /// Broadcast data to all registered clients matching the stream ID
@@ -88,15 +83,21 @@ namespace Mercury.Models
 
         public XElement GetConfiguration()
         {
-            return new XElement("Stream",
+            var config = new XElement("Stream",
                     new XAttribute("Name", this.Name),
                     new XAttribute("Source", this.Source),
                     new XAttribute("DataType", this.DataType),
-                    new XAttribute("ConnectionString", this.ConnectionString),
                     new XAttribute("ID", this.ID),
                     new XAttribute("BufferSize", this.BufferSize),
-                    new XAttribute("BufferType", this.BufferType)
-                    );
+                    new XAttribute("BufferType", this.BufferType));
+
+            var extendedConfig = new XElement("ExtendConfiguration");
+            Configuration.Keys.ToList().ForEach(
+                k => extendedConfig.Add(new XAttribute(k, Configuration[k].ToString())));
+
+            config.Add(extendedConfig);
+
+            return config;
         }
 
         /// <summary>
@@ -106,14 +107,17 @@ namespace Mercury.Models
         /// <returns></returns>
         public static StreamListener GetStreamFromConfiguration(XElement configuration)
         {
+            Dictionary<string, object> extendedConfiguration = new Dictionary<string, object>();
+            configuration.Element("ExtendConfiguration")?.Attributes().ToList().ForEach(a => extendedConfiguration.Add(a.Name.ToString(), a.Value));
+
             var listener = new StreamListener()
             {
                 Name = configuration.Attribute("Name").Value,
                 Source = (ServiceType)Enum.Parse(typeof(ServiceType), configuration.Attribute("Source").Value),
                 BufferType = (BufferInvalidationType)Enum.Parse(typeof(BufferInvalidationType), configuration.Attribute("BufferType").Value),
-                ConnectionString = configuration.Attribute("ConnectionString").Value,
                 BufferSize = Convert.ToInt32(configuration.Attribute("BufferSize").Value),
-                DataType = Type.GetType(configuration.Attribute("DataType").Value)
+                DataType = Type.GetType(configuration.Attribute("DataType").Value),
+                Configuration = extendedConfiguration
             };
 
             listener.action = new Action<StreamDataEventArgs>(listener.EventReceived);
@@ -124,7 +128,8 @@ namespace Mercury.Models
             if (StreamService.Instance.HasID(tempID))
                 listener.ID = tempID;
             else
-                listener.ID = StreamService.Instance.InitService(listener.ConnectionString, listener.Source, listener.BufferSize, listener.BufferType);
+                listener.ID = StreamService.Instance.InitService(listener.Source, listener.BufferSize, 
+                    listener.BufferType, listener.Configuration);
             listener.BufferedValues = StreamService.Instance.GetBuffuredData(listener.ID);
             return listener;
         }

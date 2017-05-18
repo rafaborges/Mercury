@@ -1,23 +1,48 @@
 ﻿using StreamServices.Buffer;
 using StreamServices.Services;
 using System;
+using System.Collections.Generic;
 
 namespace StreamServices.Interfaces
 {
     public interface IStreamConsumer
     {
-        // The main event that fires when new data comes in
+        /// <summary>
+        /// The main event that fires when new data comes in
+        /// </summary>
         event EventHandler<StreamDataEventArgs> NewData;
-        // Usually the method that connects to a source
+        /// <summary>
+        /// Usually the metho that connects to the data source
+        /// </summary>
+        /// <param name="configuration"></param>
         void RegisterConsumer();
-        // Well...
+        /// <summary>
+        /// Unregister itself from the data producer
+        /// </summary>
         void UnregisterConsumer();
-        string ConnectionSring { get; set; }
-
+        /// <summary>
+        /// Configuration to be passed to the StreamConsumer
+        /// </summary>
+        Dictionary<string, object> Configuration { get; set; }
+        /// <summary>
+        /// Unique ID for the IStreamConsumer instance
+        /// </summary>
         Guid ID { get; set; }
-
+        /// <summary>
+        /// Buffer that is injected later
+        /// </summary>
         IBuffer Buffer { get; set; }
-
+        /// <summary>
+        /// Just a pointer to <see cref="ServiceType"/>
+        /// </summary>
         ServiceType ServiceType { get; }
+
+        /// <summary>
+        /// Validates if a given configuration conforms to what
+        /// is expected by the IStreamConsumer
+        /// </summary>
+        /// <param name="configuration">A Dictionary containing the necessary configuration</param>
+        /// <returns>A bool indicating whether the configuration conforms or not</returns>
+        bool ValidateConfiguration(Dictionary<string, object> configuration);
     }
 }

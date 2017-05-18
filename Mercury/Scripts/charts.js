@@ -1,10 +1,15 @@
-﻿var charts = {};
+﻿// Holds the callback object from every chart
+// This allows easy access to all created charts
+var charts = {};
+
+//Data that is rendered by the charts
 var data = {};
 
 $(document).ready(function () {
     var dataHub = $.connection.dataHub;
 
     // Registering the function that is called by SignalR on NewEvent
+    // Not being used anymore. It's here only for reference
     dataHub.client.updateStream = function (id, timeStamp, value) {
         if (id in data)
         {
@@ -34,7 +39,9 @@ $(document).ready(function () {
 
 
     // Registering the function that is called by SignalR on NewEvent
+    // All buffered data comes in tempData
     dataHub.client.updateAllData = function (id, tempData) {
+        // Converting tempData to the format used by the charts
         $.each(tempData, function () {
             delete this["Source"];
             delete this["TimeStamp"];
@@ -44,18 +51,20 @@ $(document).ready(function () {
         })
         data[id] = tempData;
         if (id in charts) {
+            // Forcing a redraw
             charts[id].redrawChart();
         }
     };
 
+    // subscribing itself to SignalR messages
     $.connection.hub.start();
 
-    // Adding the chart once the use is done
+    // Adding the chart once it's configured
     $("#modalAddButton").click(function () {
-        // Post returns the PartialView for the new div
+        // This Post returns the PartialView for the new div
         $.post('Home/AddDataStream', {
             name: $("#streamName").val(),
-            connectionString: $("#connectionString").val(),
+            configuration: $("#configuration").val(),
             source: $("#serviceProvider").val(),
             dataType: $("#dataType").val(), 
             bufferSize: $("#bufferSize").val(),
@@ -80,10 +89,12 @@ $(document).ready(function () {
                     this.reset();
                 });
 
-        }).fail(function () {
+            }).fail(function () {
+            // TODO: Better error handling
             console.log("error");
         });
 
+        // Bye-bye, dear modal
         $("#streamConfigModal").modal("hide");
     });
 
@@ -92,9 +103,10 @@ $(document).ready(function () {
         $("#streamConfigModal").modal({ backdrop: "static" });
     });
 
-    // Lazy Loading data
+    // Lazy Loading data (maybe it will be used one day)
     $('#contentArea').load('Home/LoadStreams', LoadCharts);
 
+    // Event fired when the user clicks on start all button
     $('#startAllStreams').click(function () {
         $.ajax({
             type: "POST",
@@ -102,6 +114,7 @@ $(document).ready(function () {
         });
     });
 
+    // Event fired when the user clicks on stop all button
     $('#stopAllStreams').click(function () {
         $.ajax({
             type: "POST",
@@ -109,10 +122,12 @@ $(document).ready(function () {
         });
     });
 
+    // Event fired when the user clicks on the save button
     $('#saveView').click(function () {
         $("#saveConfig").modal({ backdrop: "static" });
     });
 
+    // Event fired when the user clicks on the modal save button
     $('#saveConfigButton').click(function () {
         $.ajax({
             type: "POST",
@@ -127,12 +142,14 @@ $(document).ready(function () {
         });
     });
 
+    // Event fired when the user expands the configuration list
     $('#loadConfiguredViews').click(function () {
         $('#configurations').load('Home/GetAllConfigurations')
     });
 });
 
-// Initialize the 3D chart
+// Initialize the D3 chart
+// TODO: make it more beautiful.
 function initChart(id, canvas) {
     var margin = { top: 0, right: 0, bottom: 20, left: 20 },
         width = 960 - margin.left - margin.right,
@@ -212,10 +229,11 @@ function initChart(id, canvas) {
     }
 }
 
+// Callback function used by ajax chart loader
 function LoadCharts (response, status, hxr) {
     if (status == "error") {
-        // Clear content and pop up error
-        alert('error');
+        // TODO: better error handling
+        Console.log("Error when loading charts")
     }
     else {
         // Creating the charts and connecting to SignalR
@@ -228,13 +246,15 @@ function LoadCharts (response, status, hxr) {
     }
 }
 
-function loadConfiguration(configuration)
-{
+// Simple ajax to get a saved configuration
+function loadConfiguration(configuration){
     $('#contentArea').load('Home/LoadConfiguration',
         { name: configuration },
         LoadCharts);
 }
 
+// Buffered data intially is saved as a data attribute to improve responsiveness
+// Later data is deleted for an obvious reason...
 function getBufferedValues(bufferedData) {
     var data = [];
     for (var i = 0; i < bufferedData.length; i++) {
@@ -246,6 +266,7 @@ function getBufferedValues(bufferedData) {
     return data;
 }
 
+// Removing the chart from the view
 function removeChart(id) {
     $("#row-" + id).slideUp("slow", function () {
         $("#row-" + id).hide();
@@ -256,6 +277,7 @@ function removeChart(id) {
     })
 }
 
+// Unsubscribe the chart from getting new data
 function stopListening(id){
     $.ajax({
         type: "POST",
@@ -264,6 +286,7 @@ function stopListening(id){
     });
 }
 
+// Subscribe the chart to get new data
 function startListening(id) {
     $.ajax({
         type: "POST",

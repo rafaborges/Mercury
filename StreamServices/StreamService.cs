@@ -52,13 +52,13 @@ namespace StreamServices
         /// <param name="connectionString">Connection string for the service</param>
         /// <param name="serviceType">The <see cref="ServiceType"/>ServiceType to be consumed</param>
         /// <returns>Returns a GUID for the requested service</returns>
-        public Guid InitService(string connectionString, ServiceType serviceType, int bufferSize, BufferInvalidationType bufferType)
+        public Guid InitService(ServiceType serviceType, 
+            int bufferSize, BufferInvalidationType bufferType, Dictionary<string, object> configuration)
         {
             // Checking if there is already a service with this connection string for
             // a given service type. This ensures that we don't spam the service provider
-            IStreamConsumer consumer = consumers.SingleOrDefault( c => 
-                c.ConnectionSring == connectionString
-                && c.ServiceType == serviceType);
+            IStreamConsumer consumer = consumers.SingleOrDefault(c =>
+               c.Configuration == configuration && c.ServiceType == serviceType);
 
             if (consumer == null)
             {
@@ -90,11 +90,22 @@ namespace StreamServices
 
                 if (consumer != null)
                 {
-                    consumers.Add(consumer);
-                    // Registering the consumer
-                    consumer.RegisterConsumer();
-                    // Subscribing to new events from the consumer
-                    consumer.NewData += ConsumerNewDataEvent;
+                    // Validating the configuration before proceeding
+                    if (consumer.ValidateConfiguration(configuration))
+                    {
+                        // Seems ok, lets do it...
+                        consumer.Configuration = configuration;
+                        // Registering the consumer
+                        consumer.RegisterConsumer();
+                        // Subscribing to new events from the consumer
+                        consumer.NewData += ConsumerNewDataEvent;
+                        // Adding to the main collection of consumers
+                        consumers.Add(consumer);
+                    }
+                    else
+                    {
+                        throw new FormatException("Configuration has missing parameters");
+                    }
                 }
             }
 

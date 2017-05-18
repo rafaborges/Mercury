@@ -20,6 +20,8 @@ namespace StreamServices.Services.Random
         public IBuffer Buffer { get; set; }
         public ServiceType ServiceType => ServiceType.Random;
 
+        public Dictionary<string, object> Configuration { get; set; }
+
         public RandomGenerator()
         {
             ID = Guid.NewGuid();
@@ -114,6 +116,12 @@ namespace StreamServices.Services.Random
             {
                 return null;
             }
+        }
+
+        public bool ValidateConfiguration(Dictionary<string, object> configuration)
+        {
+            // There is no configuration for the random generator!
+            return true;
         }
     }
 }

@@ -7,7 +7,6 @@ using StreamServices.Buffer;
 using System.Linq;
 using System.IO;
 using System.Xml.Linq;
-using System.Threading.Tasks;
 
 namespace Mercury.Controllers
 {
@@ -38,19 +37,35 @@ namespace Mercury.Controllers
         /// <param name="source">The service provider that will be uses</param>
         /// <returns>A partialView with the chart that will be displayed</returns>
         [HttpPost]
-        public ActionResult AddDataStream(string name, string connectionString, string source, string dataType, int bufferSize, string bufferType)
+        public ActionResult AddDataStream(string name, string configuration, string source, string dataType, int bufferSize, string bufferType)
         {
             Type type = Type.GetType("System." + dataType);
             BufferInvalidationType buffer = bufferType == "event" ? BufferInvalidationType.Events : BufferInvalidationType.Time;
             ServiceType service = (ServiceType)Enum.Parse(typeof(ServiceType), source);
-            StreamListener stream = new StreamListener(name, service, "", type, bufferSize, buffer);
-            var model = new List<StreamListener>() { stream };
+            var configDictionary = GetConfiguration(configuration);
+            StreamListener stream = new StreamListener(name, service, type, bufferSize, buffer, configDictionary);
             stream.StartListening();
-
             List<StreamListener> streams = (List<StreamListener>)HttpContext.Application["streams"];
             streams.Add(stream);
 
-            return PartialView("ChartElement", model);
+            return PartialView("ChartElement", new List<StreamListener>() { stream });
+        }
+
+        private Dictionary<string, object> GetConfiguration(string configString)
+        {
+            Dictionary<string, object> configuration = new Dictionary<string, object>();
+            foreach (var element in configString.Split(';'))
+            {
+                if (element != "")
+                {
+                    var configElement = element.Split('=');
+                    if (configElement.Length == 2)
+                    {
+                        configuration.Add(configElement[0], configElement[1]);
+                    }
+                }
+            }
+            return configuration;
         }
 
         #region View Controls
