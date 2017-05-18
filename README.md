@@ -6,7 +6,7 @@ I know it's far from a standard architecture, but that can give a basic overview
 
 ![Mercury](https://github.com/rafaborges/Mercury/raw/master/Documents/mercury%20architecture.png)
 
-The IBufferPersistence has not yet been uploaded as it still lacks some more tests.
+The IBufferPersistence has not yet been uploaded as it still not working as it should.
 
 ## Services
 ### Kafka
