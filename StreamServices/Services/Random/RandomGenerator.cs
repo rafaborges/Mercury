@@ -3,23 +3,45 @@ using StreamServices.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace StreamServices.Services.Random
 {
+    /// <summary>
+    /// Random interface for testing purpose
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     class RandomGenerator<T> : IStreamConsumer
     {
+        /// <summary>
+        /// Event fired whenever new data comes in
+        /// </summary>
         public event EventHandler<StreamDataEventArgs> NewData;
+        /// <summary>
+        /// Timer used to simulate data
+        /// </summary>
         private Timer timer;
+        /// <summary>
+        /// Random that will be used to generate - guess what - random values
+        /// </summary>
         private System.Random seed = new System.Random();
+        // Chars that are used for random string generation
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        public string ConnectionSring { get; set; }
+        /// <summary>
+        /// ID for this instance of consumer
+        /// </summary>
         public Guid ID { get; set; }
+        /// <summary>
+        /// Buffer containing previous data
+        /// </summary>
         public IBuffer Buffer { get; set; }
+        /// <summary>
+        /// Identification of the service type
+        /// </summary>
         public ServiceType ServiceType => ServiceType.Random;
-
+        /// <summary>
+        /// Dictionary holding the necessary configuration
+        /// </summary>
         public Dictionary<string, object> Configuration { get; set; }
 
         public RandomGenerator()
@@ -81,6 +103,9 @@ namespace StreamServices.Services.Random
             return supportedTypes.Contains(typeof(T));
         }
 
+        /// <summary>
+        /// Fills up the buffer with random data
+        /// </summary>
         private void FillBuffer()
         {
             var baseDate = DateTime.Now;
@@ -93,7 +118,10 @@ namespace StreamServices.Services.Random
             }
         }
    
-
+        /// <summary>
+        /// Generates a random based on the class type
+        /// </summary>
+        /// <returns></returns>
         private object GetRandom()
         {
             if (typeof(T) == typeof(Int16) || typeof(T) == typeof(Int32) || typeof(T) == typeof(Int64))
@@ -121,6 +149,7 @@ namespace StreamServices.Services.Random
         public bool ValidateConfiguration(Dictionary<string, object> configuration)
         {
             // There is no configuration for the random generator!
+            // TODO: Frequency interval!!
             return true;
         }
     }

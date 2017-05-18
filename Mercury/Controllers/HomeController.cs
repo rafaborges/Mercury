@@ -56,12 +56,12 @@ namespace Mercury.Controllers
             Dictionary<string, object> configuration = new Dictionary<string, object>();
             foreach (var element in configString.Split(';'))
             {
-                if (element != "")
+                if (element.Trim() != "")
                 {
                     var configElement = element.Split('=');
                     if (configElement.Length == 2)
                     {
-                        configuration.Add(configElement[0], configElement[1]);
+                        configuration.Add(configElement[0].Trim(), configElement[1].Trim());
                     }
                 }
             }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using StreamServices.Services.Kafka;
+using StreamServices.Services.Azure;
 
 namespace StreamServices
 {
@@ -65,7 +66,7 @@ namespace StreamServices
                 switch (serviceType)
                 {
                     case ServiceType.Azure:
-                        consumer = null;
+                        consumer = StreamServiceFactory.CreateConsumer<AzureEventHub<double>>();
                         break;
                     case ServiceType.Kafka:
                         consumer = StreamServiceFactory.CreateConsumer<Kafka<double>>();
