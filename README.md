@@ -13,7 +13,7 @@ The IBufferPersistence has not yet been uploaded as it still not working as it s
 The Kafka consumer expectes two parameter: host and topic. You can only add one topic per chart. It registers itself under a group id called mercury-consumer.
 
 ### Azure
-Not yet ready. Stay tuned...
+Not ready. Stay tuned...
 
 ### Random
 This is a simple random generator. It push data at a rate of one random double per second. Data ranges from 0 to 1.
