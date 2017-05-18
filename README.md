@@ -7,3 +7,13 @@ I know it's far from a standard architecture, but that can give a basic overview
 ![Mercury](https://github.com/rafaborges/Mercury/raw/master/Documents/mercury%20architecture.png)
 
 The IBufferPersistence has not yet been uploaded as it still lacks some more tests.
+
+## Services
+### Kafka
+The Kafka consumer expectes two parameter: host and topic. You can only add one topic per chart. It registers itself under a group id called mercury-consumer.
+
+### Azure
+Not yet ready. Stay tunned...
+
+### Random
+This is a simple random generator. It push data at a rate of one random double per second. Data ranges from 0 to 1.
