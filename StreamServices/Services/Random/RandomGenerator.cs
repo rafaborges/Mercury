@@ -11,7 +11,7 @@ namespace StreamServices.Services.Random
     /// Random interface for testing purpose
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    class RandomGenerator<T> : IStreamConsumer
+    public class RandomGenerator<T> : IStreamConsumer
     {
         /// <summary>
         /// Event fired whenever new data comes in

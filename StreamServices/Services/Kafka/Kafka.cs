@@ -13,7 +13,7 @@ namespace StreamServices.Services.Kafka
     /// Class that implements a Kafka consumer
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    class Kafka<T> : IStreamConsumer
+    public class Kafka<T> : IStreamConsumer
     {
         public Guid ID { get; set; }
         public IBuffer Buffer { get; set; }
