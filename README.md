@@ -22,7 +22,7 @@ Ready, but poorly tested. This consumer expects four parameters:
 ### Random
 This is a simple random generator. It push data at a rate of one random double per second. Data ranges from 0 to 1.
 
-##Known Issues
+## Known Issues
  * SQL Server buffer persistence has not been tested yet.
  * Write now saving view configuration while debugging write files to C:\Program Files (x86)\IIS Express. In the fure the path will be stored in a config files
  * The same happens to XML buffer persistence.
