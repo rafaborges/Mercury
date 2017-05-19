@@ -62,7 +62,7 @@ namespace StreamServices.Services.Azure
         /// <param name="e"></param>
         private void NewDataFromService(EventData e)
         {
-            e.Value = (T)e.Value;
+            e.Value = e.Value;
             Buffer.Push(e);
             var eventArgs = new StreamDataEventArgs(e, Buffer.ToList());
             NewData?.Invoke(null, eventArgs);

@@ -53,16 +53,16 @@ namespace Mercury.Controllers
 
         private Dictionary<string, object> GetConfiguration(string configString)
         {
+            var config = configString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
             Dictionary<string, object> configuration = new Dictionary<string, object>();
-            foreach (var element in configString.Split(';'))
+            foreach (var element in config)
             {
                 if (element.Trim() != "")
                 {
-                    var configElement = element.Split('=');
-                    if (configElement.Length == 2)
-                    {
-                        configuration.Add(configElement[0].Trim(), configElement[1].Trim());
-                    }
+                    int i = element.IndexOf('=');
+                    var key = element.Substring(0, i);
+                    var value = element.Substring(i + 1, element.Length - i - 1);
+                    configuration.Add(key, value);
                 }
             }
             return configuration;
