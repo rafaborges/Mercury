@@ -42,7 +42,7 @@ namespace Mercury.Models
             // Asking an ID for the StreamServices. If the source already exists with a given
             // configuration, the same source is reused
             ID = StreamService.Instance.InitService(source, 
-                bufferSize, bufferType, configuration, BufferPersistenceOptions.XML);
+                bufferSize, bufferType, configuration, BufferPersistenceOptions.SQLServer);
             
             // Get current buffered data. Note that if takes too long to start listening,
             // it may be outdated
@@ -129,7 +129,7 @@ namespace Mercury.Models
                 listener.ID = tempID;
             else
                 listener.ID = StreamService.Instance.InitService(listener.Source, listener.BufferSize, 
-                    listener.BufferType, listener.Configuration, BufferPersistenceOptions.XML);
+                    listener.BufferType, listener.Configuration, BufferPersistenceOptions.SQLServer);
             listener.BufferedValues = StreamService.Instance.GetBuffuredData(listener.ID);
             return listener;
         }

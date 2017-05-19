@@ -28,7 +28,8 @@ namespace StreamServices.Buffer
                     XElement.Load(file.FullName);
                 }
             }
-
+            // Sorting by timestamp so you don't have OOO
+            bufferedData.Sort((x, y) => x.TimeStamp.CompareTo(y.TimeStamp));
             return bufferedData;
         }
 
