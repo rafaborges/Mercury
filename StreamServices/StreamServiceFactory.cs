@@ -1,4 +1,5 @@
-﻿using StreamServices.Buffer;
+﻿using System;
+using StreamServices.Buffer;
 using StreamServices.Interfaces;
 
 namespace StreamServices
@@ -23,11 +24,32 @@ namespace StreamServices
         /// </summary>
         /// <typeparam name="T">A class that implements IBuffer</typeparam>
         /// <returns>An instance of T</returns>
-        public static T CreateBuffer<T>(int capacity) where T : IBuffer, new()
+        public static T CreateBuffer<T>(int capacity, BufferPersistenceOptions persitence, Guid id) where T : IBuffer, new()
         {
             var buffer = new T();
+            switch (persitence)
+            {
+                case BufferPersistenceOptions.None:
+                    buffer.BufferPersistence = null;
+                    break;
+                case BufferPersistenceOptions.XML:
+                    buffer.BufferPersistence = CreateBufferPersistence<XMLBufferStorage>();
+                    break;
+                case BufferPersistenceOptions.SQLServer:
+                    buffer.BufferPersistence = CreateBufferPersistence<SQLBufferStorage>();
+                    break;
+                default:
+                    break;
+            }
             buffer.Capacity = capacity;
+
             return buffer;
+        }
+
+        public static T CreateBufferPersistence<T>() where T : IBufferPersistence, new()
+        {
+            var bufferPersistence = new T();
+            return bufferPersistence;
         }
     }
 }

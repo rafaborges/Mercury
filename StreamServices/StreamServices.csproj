@@ -77,9 +77,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Buffer\XMLBufferStorage.cs" />
     <Compile Include="Buffer\BufferOptions.cs" />
     <Compile Include="Buffer\IBuffer.cs" />
+    <Compile Include="Buffer\IBufferPersistence.cs" />
     <Compile Include="Buffer\RingBuffer.cs" />
+    <Compile Include="Buffer\SQLBufferStorage.cs" />
     <Compile Include="Buffer\TimeBuffer.cs" />
     <Compile Include="Services\Azure\EventProcessorFactory.cs" />
     <Compile Include="Services\EventData.cs" />

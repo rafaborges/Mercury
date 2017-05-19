@@ -43,11 +43,6 @@ namespace StreamServices.Buffer
         private Guid _id;
 
         /// <summary>
-        /// The buffer persistence option
-        /// </summary>
-        private BufferPersistenceOptions _persistenceOption;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Buffer.RingBuffer{T}"/> class.
         /// 
         /// </summary>
@@ -67,7 +62,7 @@ namespace StreamServices.Buffer
             }
 
             // Loading from repository. Returns an empty [] if no previous data
-            var items = Load();
+            var items = new EventData[] { };
 
             if (items.Length > capacity)
             {
@@ -120,6 +115,8 @@ namespace StreamServices.Buffer
         /// Current buffer size (the number of elements that the buffer has).
         /// </summary>
         public int Size { get { return _size; } }
+
+        public IBufferPersistence BufferPersistence { get; set; }
 
         /// <summary>
         /// Element at the front of the buffer - this[0].
@@ -183,6 +180,7 @@ namespace StreamServices.Buffer
         {
             if (IsFull)
             {
+                BufferPersistence?.RemoveData(_buffer[_end]);
                 _buffer[_end] = item;
                 Increment(ref _end);
                 _start = _end;
@@ -193,6 +191,7 @@ namespace StreamServices.Buffer
                 Increment(ref _end);
                 ++_size;
             }
+            BufferPersistence?.StoreData(item);
         }
 
         /// <summary>
@@ -217,6 +216,7 @@ namespace StreamServices.Buffer
                 _buffer[_start] = item;
                 ++_size;
             }
+            BufferPersistence?.StoreData(item);
         }
 
         /// <summary>
@@ -227,8 +227,10 @@ namespace StreamServices.Buffer
         {
             ThrowIfEmpty("Cannot take elements from an empty buffer.");
             Decrement(ref _end);
+            BufferPersistence?.RemoveData(_buffer[_end]);
             _buffer[_end] = default(EventData);
             --_size;
+            
         }
 
         /// <summary>
@@ -238,6 +240,7 @@ namespace StreamServices.Buffer
         public void PopFront()
         {
             ThrowIfEmpty("Cannot take elements from an empty buffer.");
+            BufferPersistence?.RemoveData(_buffer[_start]);
             _buffer[_start] = default(EventData);
             Increment(ref _start);
             --_size;
@@ -366,97 +369,9 @@ namespace StreamServices.Buffer
             }
         }
 
-        /// <summary>
-        /// Persist buffer data to external repository
-        /// </summary>
-        private void Persist()
-        {
-            switch (this._persistenceOption)
-            {
-                case BufferPersistenceOptions.None:
-                    break;
-                case BufferPersistenceOptions.XML:
-                    PersistToFile();
-                    break;
-                case BufferPersistenceOptions.SQLServer:
-                    PersistToSQLServer();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Load data from persisted repository
-        /// </summary>
-        /// <returns>Array with previous buffered data</returns>
-        private object[] Load()
-        {
-            switch (this._persistenceOption)
-            {
-                case BufferPersistenceOptions.None:
-                    return new object[] { };
-                case BufferPersistenceOptions.XML:
-                    return LoadFromFile();
-                case BufferPersistenceOptions.SQLServer:
-                    return LoadFromSQLServer();
-                default:
-                    return new object[] { };
-            }
-        }
-
-        private void PersistToFile()
-        {
-            using (var stream = File.Open(_id.ToString(), FileMode.OpenOrCreate))
-            {
-                var serializer = new XmlSerializer(typeof(object[]));
-                serializer.Serialize(stream, this.ToArray());
-            }
-        }
-
-        private object[] LoadFromFile()
-        {
-            if (File.Exists(_id.ToString()))
-            {
-                using (var stream = new FileStream(_id.ToString(), FileMode.Open))
-                {
-                    try
-                    {
-                        var serializer = new XmlSerializer(typeof(object[]));
-                        var persistedBuffer = (object[])serializer.Deserialize(stream);
-                        return persistedBuffer;
-                    }
-                    catch
-                    {
-                        throw new InvalidDataException("Corrupted Buffer File");
-                    }
-                }
-            }
-            else
-            {
-                return new object[] { };
-            }
-
-        }
-
-        private void PersistToSQLServer()
-        {
-            throw new NotImplementedException();
-        }
-
-        private object[] LoadFromSQLServer()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Serialize()
-        {
-            throw new NotImplementedException();
-        }
-
         public List<EventData> ToList()
         {
-            return ToArray().ToList<EventData>();
+            return ToArray().ToList();
         }
 
         public void Pop() => PopFront();

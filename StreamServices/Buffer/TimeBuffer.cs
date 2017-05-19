@@ -43,6 +43,8 @@ namespace StreamServices.Buffer
 
         public int Size => _data.Count;
 
+        public IBufferPersistence BufferPersistence { get; set; }
+
         public IEnumerator GetEnumerator()
         {
             return _data.Select(d => d.Item2).GetEnumerator();
@@ -67,6 +69,8 @@ namespace StreamServices.Buffer
                 _data.Add(new Tuple<Guid, EventData>(id, item));
             }
 
+            BufferPersistence?.StoreData(item);
+
             // Here we create a new tas that will be schedule
             // To be executed in span seconds
             // This is the best approach for a asp.net mvc
@@ -75,12 +79,8 @@ namespace StreamServices.Buffer
             {
                 await Task.Delay(Capacity * 1000);
                 DeleteData(id);
+                BufferPersistence?.RemoveData(item);
             });
-        }
-
-        public void Serialize()
-        {
-            throw new NotImplementedException();
         }
 
         public EventData[] ToArray()

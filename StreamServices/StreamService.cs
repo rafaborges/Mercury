@@ -54,7 +54,8 @@ namespace StreamServices
         /// <param name="serviceType">The <see cref="ServiceType"/>ServiceType to be consumed</param>
         /// <returns>Returns a GUID for the requested service</returns>
         public Guid InitService(ServiceType serviceType, 
-            int bufferSize, BufferInvalidationType bufferType, Dictionary<string, object> configuration)
+            int bufferSize, BufferInvalidationType bufferType, Dictionary<string, object> configuration, 
+            BufferPersistenceOptions bufferPersistenceOption)
         {
             // Checking if there is already a service with this connection string for
             // a given service type. This ensures that we don't spam the service provider
@@ -82,10 +83,12 @@ namespace StreamServices
                 switch (bufferType)
                 {
                     case BufferInvalidationType.Events:
-                        consumer.Buffer = StreamServiceFactory.CreateBuffer<RingBuffer>(bufferSize);
+                        consumer.Buffer = StreamServiceFactory.CreateBuffer<RingBuffer>(
+                            bufferSize, bufferPersistenceOption, consumer.ID);
                         break;
                     case BufferInvalidationType.Time:
-                        consumer.Buffer = StreamServiceFactory.CreateBuffer<TimeBuffer>(bufferSize);
+                        consumer.Buffer = StreamServiceFactory.CreateBuffer<TimeBuffer>(
+                            bufferSize, bufferPersistenceOption, consumer.ID);
                         break;
                 }   
 

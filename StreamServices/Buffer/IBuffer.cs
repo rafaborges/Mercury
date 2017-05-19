@@ -13,7 +13,7 @@ namespace StreamServices.Buffer
         void Pop();
         void Push(EventData item);
         EventData[] ToArray();
-        void Serialize();
         List<EventData> ToList();
+        IBufferPersistence BufferPersistence { get; set; }
     }
 }
