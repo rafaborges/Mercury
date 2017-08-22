@@ -1,0 +1,43 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Giving some space from the navbar */
+#main-container {
+    margin-top: 10px;
+}
+
+/* Set the style for d3 line chart*/
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+}
+
+/* Allowing the navbar buttons to center properly */
+.toolbar-space{
+    margin-top: 5px;
+}
+
+.hover-div {
+    padding-left: 5px;
+    cursor: pointer;
+}
+
+.hover-div:hover {
+    background: #223241;
+}

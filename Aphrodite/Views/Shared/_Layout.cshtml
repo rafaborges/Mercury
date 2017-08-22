@@ -1,0 +1,53 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="/Content/bootstrap.css" rel="stylesheet" />
+    <link href="/Content/site.css" rel="stylesheet" />
+    <script src="/Scripts/modernizr-2.6.2.js"></script>
+    <script src="/Scripts/jquery-1.10.2.js"></script>
+    <script src="/Scripts/bootstrap.js"></script>
+    <script src="/Scripts/respond.js"></script>
+    <script src="/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    @RenderSection("scripts", required: false)
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">Mercury</a>
+            </div>
+
+            <div class="navbar-collapse collapse pull-right">
+                <div class="btn-toolbar toolbar-space">
+                    <div class="btn-group" role="group" aria-label="Buttons">
+                        <button type="button" class="btn btn-default btn-sm" id="addChart"><span class="glyphicon glyphicon-plus" aria-label="Add stream" aria-hidden="true"></span></button>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="Buttons">
+                        <button type="button" class="btn btn-default btn-sm" id="startAllStreams"><span class="glyphicon glyphicon-play" aria-label="Start all streams" aria-hidden="true"></span></button>
+                        <button type="button" class="btn btn-default btn-sm" id="stopAllStreams"><span class="glyphicon glyphicon-stop" aria-label="Stop all streams" aria-hidden="true"></span></button>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="Buttons">
+                        <button type="button" class="btn btn-default btn-sm" id="saveView"><span class="glyphicon glyphicon-floppy-disk" aria-label="Save current configuration" aria-hidden="true"></span></button>
+                        <button type="button" class="btn btn-default btn-sm dropdown-toggle" id="loadConfiguredViews" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-folder-open" aria-label="Load Configuration" aria-hidden="true"></span></button>
+                        
+                        <div class="dropdown-menu dropdown-menu-right" id="configurations">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - OSISoft</p>
+        </footer>
+    </div>
+</body>
+</html>

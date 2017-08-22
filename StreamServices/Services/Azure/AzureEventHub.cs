@@ -20,7 +20,7 @@ namespace StreamServices.Services.Azure
         /// <summary>
         /// Unique ID for this instance of the consumer
         /// </summary>
-        public Guid ID { get; set; }
+        public Guid ID { get; }
         /// <summary>
         /// Buffered data
         /// </summary>
@@ -62,7 +62,6 @@ namespace StreamServices.Services.Azure
         /// <param name="e"></param>
         private void NewDataFromService(EventData e)
         {
-            e.Value = e.Value;
             Buffer.Push(e);
             var eventArgs = new StreamDataEventArgs(e, Buffer.ToList());
             NewData?.Invoke(null, eventArgs);

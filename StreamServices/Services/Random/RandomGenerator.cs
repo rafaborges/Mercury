@@ -30,7 +30,7 @@ namespace StreamServices.Services.Random
         /// <summary>
         /// ID for this instance of consumer
         /// </summary>
-        public Guid ID { get; set; }
+        public Guid ID { get; }
         /// <summary>
         /// Buffer containing previous data
         /// </summary>

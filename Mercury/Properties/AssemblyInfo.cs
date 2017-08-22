@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using log4net;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

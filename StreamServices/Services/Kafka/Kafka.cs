@@ -15,7 +15,7 @@ namespace StreamServices.Services.Kafka
     /// <typeparam name="T"></typeparam>
     public class Kafka<T> : IStreamConsumer
     {
-        public Guid ID { get; set; }
+        public Guid ID { get; }
         public IBuffer Buffer { get; set; }
         public ServiceType ServiceType => ServiceType.Kafka;
         public Dictionary<string, object> Configuration { get; set; }

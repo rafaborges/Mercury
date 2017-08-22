@@ -9,9 +9,9 @@ namespace StreamServices.Services
     /// </summary>
     public class EventData
     {
-        public Guid Source { get; set; }
-        public DateTime TimeStamp { get; set; }
-        public object Value { get; set; }
+        public Guid Source { get; }
+        public DateTime TimeStamp { get; }
+        public object Value { get; }
         public string FormatedTimeStamp => TimeStamp.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff");
 
         public EventData(Guid source, DateTime timestamp, object value)

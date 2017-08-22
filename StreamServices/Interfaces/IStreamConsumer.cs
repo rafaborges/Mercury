@@ -27,7 +27,7 @@ namespace StreamServices.Interfaces
         /// <summary>
         /// Unique ID for the IStreamConsumer instance
         /// </summary>
-        Guid ID { get; set; }
+        Guid ID { get; }
         /// <summary>
         /// Buffer that is injected later
         /// </summary>

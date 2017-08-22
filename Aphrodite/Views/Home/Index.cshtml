@@ -1,0 +1,100 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+
+@{
+    ViewBag.Title = "Mercury";
+    Layout = "Shared/_Layout.cshtml";
+}
+
+@section scripts
+{
+    <script src="/signalr/hubs"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="/Scripts/charts.js"></script>
+}
+
+<div class="panel-body sortable" id="contentArea">
+    @*Chart block*@
+</div>
+
+<!-- Add Stream Modal -->
+<div class="modal fade" id="streamConfigModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header" id="stream-add">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">New Data Stream</h4>
+            </div>
+            <div class="modal-body">
+                <form id="streamForm">
+                    <div class="form-group">
+                        <label for="streamName" class="form-control-label">Name:</label>
+                        <textarea class="form-control" id="streamName"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceProvider">Service:</label>
+                        <select class="form-control" id="serviceProvider">
+                            <option value="Azure">Azure Event Hub</option>
+                            <option>Kafka</option>
+                            <option>Random</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dataType">Data Type:</label>
+                        <select class="form-control" id="dataType">
+                            <option>Double</option>
+                            <option>String</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="configuration" class="form-control-label">Configuration:</label>
+                        <textarea class="form-control" placeholder="parameter1=value1;parameter2=value2..." id="configuration"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bufferSize" class="form-control-label">Buffer:</label>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <input type="number" min="1" value="100" class="form-control" id="bufferSize">
+                            </div>
+                            <div class="col-xs-6">
+                                <select class="form-control" id="bufferType">
+                                    <option value="event">Events</option>
+                                    <option value="time">Seconds</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Dimiss</button>
+                <button type="button" class="btn btn-primary" id="modalAddButton">Add Stream</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Config Modal -->
+<div class="modal fade" id="saveConfig" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                <h4 class="modal-title">Save Current Confiuration</h4>
+            </div>
+            <div class="modal-body">
+                <form id="saveForm">
+                    <div class="form-group">
+                        <label for="configName" class="form-control-label">Name:</label>
+                        <input class="form-control" id="configName">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Dimiss</button>
+                <button type="button" class="btn btn-primary" id="saveConfigButton">Save Config</button>
+            </div>
+        </div>
+    </div>
+</div>
